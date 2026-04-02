@@ -2,7 +2,11 @@
 
 A dark, animated single-page portfolio built in **vanilla HTML, CSS, and JavaScript** — no frameworks, no build tools, no dependencies except one font API and EmailJS for the contact form.
 
-![Preview](https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=80)
+<p align="center">
+  <img src="assets/screenshot_1.png" width="30%" alt="Home" />
+  <img src="assets/screenshot_2.png" width="30%" alt="About" />
+  <img src="assets/screenshot_3.png" width="30%" alt="Contact" />
+</p>
 
 ---
 
