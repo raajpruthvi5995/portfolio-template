@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Gallery</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0d0b09;--white:#f0ede8;--gray:#7a7880;--red:#c0392b;--red2:#e74c3c;--black:#09080b;--border:rgba(240,237,232,0.08);}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:'Satoshi',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;cursor:none;}
+#cur{position:fixed;width:11px;height:11px;border-radius:50%;background:var(--red2);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--red);left:-20px;top:-20px;transition:width .15s,height .15s;}
+#cur.big{width:30px;height:30px;opacity:.3;}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:18px 36px;display:flex;align-items:center;justify-content:space-between;background:rgba(13,11,9,.92);backdrop-filter:blur(20px);border-bottom:.5px solid var(--border);}
+.nav-logo{font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;color:var(--white);text-decoration:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border:1px solid var(--border);border-radius:99px;font-size:11px;color:var(--gray);text-decoration:none;transition:all .2s;letter-spacing:.06em;}
+.back-btn:hover{color:var(--white);border-color:rgba(240,237,232,.2);}
+.hero{padding:140px 52px 60px;border-bottom:1px solid var(--border);}
+.hero-label{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--red2);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-label::before{content:'';display:inline-block;width:22px;height:1px;background:var(--red2);}
+.hero-title{font-family:'Clash Display',sans-serif;font-size:clamp(52px,8vw,110px);font-weight:700;letter-spacing:-.04em;line-height:.88;color:var(--white);}
+.hero-title .dim{-webkit-text-stroke:2px rgba(240,237,232,.2);color:transparent;}
+.hero-sub{font-size:15px;color:var(--gray);margin-top:18px;max-width:480px;line-height:1.7;}
+/* Masonry-style gallery */
+#gallery{padding:52px;columns:3;column-gap:16px;}
+.gitem{break-inside:avoid;margin-bottom:16px;border-radius:8px;overflow:hidden;cursor:pointer;position:relative;transition:transform .3s,box-shadow .3s;}
+.gitem:hover{transform:scale(1.02);box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.gitem img{width:100%;display:block;object-fit:cover;}
+/* Random heights via aspect ratios */
+.gitem.tall img{aspect-ratio:3/4;}
+.gitem.wide img{aspect-ratio:16/9;}
+.gitem.sq img{aspect-ratio:1/1;}
+.gitem.xtall img{aspect-ratio:2/3;}
+.gitem.short img{aspect-ratio:4/3;}
+.gitem-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(9,8,11,.85));opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:18px;}
+.gitem:hover .gitem-overlay{opacity:1;}
+.gitem-label{font-size:11px;color:rgba(240,237,232,.8);letter-spacing:.06em;text-transform:uppercase;}
+/* Lightbox */
+.lightbox{position:fixed;inset:0;z-index:3500;display:none;align-items:center;justify-content:center;}
+.lightbox.on{display:flex;}
+.lb-bg{position:absolute;inset:0;background:rgba(0,0,0,.96);}
+.lb-img{position:relative;z-index:2;transform:scale(.5);filter:blur(20px);opacity:0;transition:transform .6s cubic-bezier(.16,1,.3,1),filter .6s,opacity .5s;}
+.lightbox.on .lb-img{transform:scale(1);filter:blur(0);opacity:1;}
+.lb-img img{max-width:88vw;max-height:88vh;border-radius:8px;object-fit:contain;display:block;}
+.lb-close{position:fixed;top:24px;right:32px;z-index:3;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--white);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.lb-close:hover{background:var(--red);}
+footer{padding:28px 52px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ft-left{font-size:12px;color:var(--gray);}
+.ft-right{font-size:12px;color:var(--gray2,#3d3a44);}
+@media(max-width:900px){#gallery{columns:2;padding:28px;}}
+@media(max-width:580px){#gallery{columns:1;padding:16px;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div class="lightbox" id="lightbox">
+  <div class="lb-bg" onclick="closeLb()"></div>
+  <div class="lb-img"><img id="lbImg" src="" alt=""/></div>
+  <button class="lb-close" onclick="closeLb()">&#x2715;</button>
+</div>
+<nav>
+  <a href="index.html" class="nav-logo">yourname</a>
+  <a href="index.html" class="back-btn">&#x2190; Back to portfolio</a>
+</nav>
+<div class="hero">
+  <div class="hero-label">03 &#8212; Photography</div>
+  <div class="hero-title">Full<br><span class="dim">Gallery.</span></div>
+  <p class="hero-sub">500+ frames. Aviation, street, landscape and portraits. Every shot tells a story.</p>
+</div>
+<div id="gallery"></div>
+<footer>
+  <div class="ft-left">&#169; name &#183; location</div>
+  <div class="ft-right">500+ frames</div>
+</footer>
+<script>
+// Cursor
+var cur=document.getElementById('cur');
+document.addEventListener('mousemove',function(e){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+document.querySelectorAll('a,button,.gitem').forEach(function(el){
+  el.addEventListener('mouseenter',function(){cur.classList.add('big');});
+  el.addEventListener('mouseleave',function(){cur.classList.remove('big');});
+});
+
+// Gallery images — Unsplash aviation, street, landscape, portrait photos
+var PHOTOS = [
+  {url:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200&q=85',label:'Aviation'},
+  {url:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=85',label:'Cityscape'},
+  {url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=85',label:'Landscape'},
+  {url:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=85',label:'Nature'},
+  {url:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=85',label:'Landscape'},
+  {url:'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=1200&q=85',label:'Aviation'},
+  {url:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=85',label:'Portrait'},
+  {url:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1200&q=85',label:'Street'},
+  {url:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=85',label:'Mountain'},
+  {url:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=1200&q=85',label:'Aviation'},
+  {url:'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=85',label:'Street'},
+  {url:'https://images.unsplash.com/photo-1500522144261-ea64433bbe27?w=1200&q=85',label:'Landscape'},
+  {url:'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=85',label:'Urban'},
+  {url:'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&q=85',label:'Night sky'},
+  {url:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=85',label:'Paris'},
+  {url:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=85',label:'London'},
+  {url:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=85',label:'Portrait'},
+  {url:'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=85',label:'Tech'},
+  {url:'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=85',label:'Bird'},
+  {url:'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=85',label:'Lake'},
+  {url:'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=1200&q=85',label:'Mountains'},
+  {url:'https://images.unsplash.com/photo-1431274172761-fcdab704a5bf?w=1200&q=85',label:'City'},
+  {url:'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=85',label:'Stars'},
+  {url:'https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?w=1200&q=85',label:'Forest'},
+];
+
+// Aspect ratio classes — random but seeded by index for consistency
+var RATIOS = ['tall','wide','sq','xtall','short','wide','sq','tall','short','xtall'];
+var gallery = document.getElementById('gallery');
+
+PHOTOS.forEach(function(p, i){
+  var div = document.createElement('div');
+  div.className = 'gitem ' + RATIOS[i % RATIOS.length];
+  var img = document.createElement('img');
+  img.src = p.url;
+  img.alt = p.label;
+  img.loading = 'lazy';
+  var ov = document.createElement('div');
+  ov.className = 'gitem-overlay';
+  ov.innerHTML = '<span class="gitem-label">'+p.label+'</span>';
+  div.appendChild(img);
+  div.appendChild(ov);
+  div.addEventListener('click', function(){ openLb(p.url); });
+  gallery.appendChild(div);
+});
+
+function openLb(url){
+  var lb = document.getElementById('lightbox');
+  document.getElementById('lbImg').src = url;
+  lb.style.display = 'flex';
+  requestAnimationFrame(function(){requestAnimationFrame(function(){lb.classList.add('on');});});
+}
+function closeLb(){
+  var lb = document.getElementById('lightbox');
+  lb.classList.remove('on');
+  setTimeout(function(){lb.style.display='none';document.getElementById('lbImg').src='';},500);
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb();});
+</script>
+</body>
+</html>
